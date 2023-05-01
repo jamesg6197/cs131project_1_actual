@@ -234,6 +234,9 @@ class ObjectDefinition:
                 (op1.type == str and op2.type == str) or \
                 (op1.type == bool and op2.type == bool):
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
+                if (op1.type == None or op2.type == None):
+                    return Value(InterpreterBase.TRUE_DEF, bool)
+                
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
                 if (op1.type == bool and op2.type == bool):
