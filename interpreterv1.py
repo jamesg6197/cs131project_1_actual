@@ -348,9 +348,9 @@ class ObjectDefinition:
         return res, exit_flag
 
     def __execute_return_statement(self, statement, parameters = {}):
-        _, *expression = statement
-        if expression == []:
+        if len(statement) == 1:
             return Value(str(InterpreterBase.NULL_DEF), None), True
+        _, expression = statement
     
         return_val = self.__solve_expression(expression, parameters)
         return return_val, True
