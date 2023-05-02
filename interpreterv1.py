@@ -156,7 +156,7 @@ class ObjectDefinition:
             return self.interpreter.classes[s]
         self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
 
-    def __solve_expression(self, expression, parameters):
+    def __solve_expression(self, expression, parameters = {}):
         if type(expression) != list:
             return self.convert_value(expression, parameters)
         
@@ -615,9 +615,13 @@ program_10 = ['(class person',
 ]
 program_11 = [
     '(class main',
+    '(field p true)'
+    '(method z ()',
+        '(return true)',
+    ')',
     '(method main ()',
         '(if (true)',
-            '(print (! true))',
+            '(print (! (call me z)))',
             ')',
         ')',
     ')',
