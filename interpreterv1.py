@@ -42,9 +42,13 @@ class Interpreter(InterpreterBase):
          for class_def in parsed_program:
             class_name = class_def[1] 
             c_def = ClassDefinition(class_name, self)
+            if class_name in self.classes:
+                super().error(ErrorType.TYPE_ERROR)
             for item in class_def:
                 if item[0] == InterpreterBase.FIELD_DEF:
                     name, value = item[1:]
+                    if name in c_def.fields:
+                        super().error(ErrorType.NAME_ERROR)
                     convert_success, value = convert_string_to_native_val(value)
                     if not convert_success:
                         super().error(ErrorType.TYPE_ERROR)
@@ -52,7 +56,10 @@ class Interpreter(InterpreterBase):
 
                 elif item[0] == InterpreterBase.METHOD_DEF:
                     name, parameters, statement = item[1:]
+                    if name in c_def.fields:
+                        super().error(ErrorType.NAME_ERROR)
                     c_def.add_method(name, parameters, statement)
+
 
             self.classes[class_name] = c_def
 
@@ -258,7 +265,7 @@ class ObjectDefinition:
 
     def __execute_print_statement(self, statement, parameters):
         args = statement[1:]
-        args = [str(self.__solve_expression(arg, parameters).get_pythonic_val()) for arg in args]
+        args = [self.__solve_expression(arg, parameters).val for arg in args]
         output = "".join(args)
         self.interpreter.output(output)
         return Value(str(InterpreterBase.NULL_DEF), None), False
@@ -286,7 +293,8 @@ class ObjectDefinition:
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
             res = self.run_method(method, method_params)
             return res, False
-
+        elif obj == 'null':
+            self.interpreter.error(ErrorType.FAULT_ERROR)
         else:
             if obj not in self.fields:
                 self.interpreter.error(ErrorType.NAME_ERROR)
