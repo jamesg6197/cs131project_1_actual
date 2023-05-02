@@ -291,6 +291,8 @@ class ObjectDefinition:
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
 
         if obj == InterpreterBase.ME_DEF:
+            if method not in self.methods:
+                self.interpreter.error(ErrorType.NAME_ERROR)
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
