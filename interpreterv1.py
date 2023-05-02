@@ -328,6 +328,7 @@ class ObjectDefinition:
             if false_exp != []:
                 res, exit_flag = self.__run_statement(false_exp[0], parameters)
                 return res, exit_flag
+            return Value(InterpreterBase.NULL_DEF, None), exit_flag
             
 
     def __execute_while_statement(self, statement, parameters):
@@ -594,7 +595,7 @@ program_10 = ['(class person',
 program_11 = [
     '(class main',
     '(method main ()',
-        '(if (== null null)',
+        '(if (!= 1 null)',
             '(print "hello")',
             ')',
         ')',
