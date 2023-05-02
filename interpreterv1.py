@@ -36,7 +36,7 @@ class Interpreter(InterpreterBase):
     def __find_definition_for_class(self, class_name):
         if class_name in self.classes:
             return self.classes[class_name]
-        super().error(ErrorType.TYPE_ERROR)
+        super().error(ErrorType.NAME_ERROR)
 
     def __discover_all_classes_and_track_them(self, parsed_program):
          for class_def in parsed_program:
@@ -48,7 +48,7 @@ class Interpreter(InterpreterBase):
                 if item[0] == InterpreterBase.FIELD_DEF:
                     name, value = item[1:]
                     if name in c_def.fields:
-                        super().error(ErrorType.TYPE_ERROR)
+                        super().error(ErrorType.NAME_ERROR)
                     convert_success, value = convert_string_to_native_val(value)
                     if not convert_success:
                         super().error(ErrorType.TYPE_ERROR)
@@ -57,7 +57,7 @@ class Interpreter(InterpreterBase):
                 elif item[0] == InterpreterBase.METHOD_DEF:
                     name, parameters, statement = item[1:]
                     if name in c_def.methods:
-                        super().error(ErrorType.TYPE_ERROR)
+                        super().error(ErrorType.NAME_ERROR)
                     c_def.add_method(name, parameters, statement)
 
             self.classes[class_name] = c_def
@@ -134,7 +134,7 @@ class ObjectDefinition:
     def __find_method(self, method_name) -> Method:
         if method_name in self.methods:
             return self.methods[method_name]
-        self.interpreter.error(ErrorType.TYPE_ERROR)
+        self.interpreter.error(ErrorType.NAME_ERROR)
 
     def run_method(self, method_name, parameters = {}):
         method = self.__find_method(method_name)
@@ -154,7 +154,7 @@ class ObjectDefinition:
             return self.fields[s].value
         if s in self.interpreter.classes:
             return self.interpreter.classes[s]
-        self.interpreter.error(ErrorType.TYPE_ERROR, f'{s} is not defined')
+        self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
 
     def __solve_expression(self, expression, parameters = {}):
         if type(expression) != list:
@@ -296,7 +296,7 @@ class ObjectDefinition:
             self.fields[var_name].value = var_val
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
-        self.interpreter.error(ErrorType.TYPE_ERROR)
+        self.interpreter.error(ErrorType.NAME_ERROR)
 
 
     def __execute_call_statement(self, statement, parameters = {}):
@@ -304,14 +304,14 @@ class ObjectDefinition:
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
         if obj == InterpreterBase.ME_DEF:
             if method not in self.methods:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
+                self.interpreter.error(ErrorType.NAME_ERROR)
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
             res = self.run_method(method, method_params)
             return res, False
         elif obj == InterpreterBase.NULL_DEF:
-            self.interpreter.error(ErrorType.FAULT_ERROR)
+            self.interpreter.error(ErrorType.TYPE_ERROR)
         else:
             if type(obj) == list:
                 obj = self.__solve_expression(obj, parameters)
@@ -319,16 +319,16 @@ class ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
 
             elif obj not in self.fields:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
+                self.interpreter.error(ErrorType.NAME_ERROR)
 
             else:
                 obj = self.fields[obj].value
                 if type(obj) != ObjectDefinition:
-                    self.interpreter.error(ErrorType.FAULT_ERROR)
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
 
 
             if method not in obj.methods:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
+                self.interpreter.error(ErrorType.NAME_ERROR)
 
             if len(method_params) != len(obj.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
@@ -385,8 +385,6 @@ class ObjectDefinition:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
-        if type(cond_res) != Value or cond_res.type != bool:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
 
@@ -430,13 +428,17 @@ program_12 = [
 
 
 	'(class main',
+        '(field num true)'
          '(method foo (q) ',
-           '(while (== 7 "7")',
+           '(while (num)',
+                    '(begin',
+                    '(set num 10)'
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
                             '(set q (- q 1))',
                         ')',
+                    ')',
                     ')',
            ')  ',
          ')',
@@ -446,18 +448,18 @@ program_12 = [
       ')',
 
 ]
-# interpreter = Interpreter()
-# # # # interpreter.run(program_1) 
-# # # # print()
-# # # # interpreter.run(program_2) 
-# # # # print()
-# # # # interpreter.run(program_3)
-# # # # print()
-# # # # interpreter.run(program_4)
-# # # # print()
-# # # #interpreter.run(program_6)
-# # # # interpreter.run(program_7)
-# # # # print()
-# # # #interpreter.run(program_10)
-# # # #
-# interpreter.run(program_12)
+#interpreter = Interpreter()
+# # # interpreter.run(program_1) 
+# # # print()
+# # # interpreter.run(program_2) 
+# # # print()
+# # # interpreter.run(program_3)
+# # # print()
+# # # interpreter.run(program_4)
+# # # print()
+# # #interpreter.run(program_6)
+# # # interpreter.run(program_7)
+# # # print()
+# # #interpreter.run(program_10)
+# # #
+#interpreter.run(program_12)
