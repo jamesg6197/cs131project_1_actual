@@ -309,7 +309,6 @@ class ObjectDefinition:
     def __execute_call_statement(self, statement, parameters = {}):
         _, obj, method, *method_params = statement
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
-
         if obj == InterpreterBase.ME_DEF:
             if method not in self.methods:
                 self.interpreter.error(ErrorType.NAME_ERROR)
@@ -325,11 +324,16 @@ class ObjectDefinition:
                 obj = self.__solve_expression(obj, parameters)
                 if type(obj) != ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
+
             elif obj not in self.fields:
                 self.interpreter.error(ErrorType.NAME_ERROR)
 
             else:
                 obj = self.fields[obj].value
+                if type(obj) != ObjectDefinition:
+                    self.interpreter.error(ErrorType.FAULT_ERROR)
+
+
             if method not in obj.methods:
                 self.interpreter.error(ErrorType.NAME_ERROR)
 
@@ -656,7 +660,7 @@ program_11 = [
     '(field p null)'
     '(method z ()',
         '(begin',
-            '(while (p)'
+            '(while (== p null)'
                 '(set p (new person))',
             ')'
             '(return false)'
@@ -704,3 +708,4 @@ interpreter = Interpreter()
 # print()
 #interpreter.run(program_10)
 #
+interpreter.run(program_11)
