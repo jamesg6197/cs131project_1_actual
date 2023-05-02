@@ -143,7 +143,7 @@ class ObjectDefinition:
         return result
     
     def convert_value(self, s, parameters = {}):
-        if type(s) == Value:
+        if type(s) == Value or type(s) == ObjectDefinition:
             return s
         convert_success, value= convert_string_to_native_val(s) 
         if convert_success != False:
@@ -193,7 +193,10 @@ class ObjectDefinition:
                 op2 = self.__solve_expression(op2, parameters)
             op1 = self.convert_value(op1, parameters)
             op2 = self.convert_value(op2, parameters)
-            op1_py_val, op2_py_val = op1.get_pythonic_val(), op2.get_pythonic_val()
+            if type(op1) != ObjectDefinition:
+                op1_py_val = op1.get_pythonic_val()
+            if type(op2) != ObjectDefinition:
+                op2_py_val = op2.get_pythonic_val()
             
             if operator == "+":
                 if (op1.type == int and op2.type == int):
@@ -234,18 +237,20 @@ class ObjectDefinition:
                     return Value(str(op1_py_val >= op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'>= operator not supported between {op1.type} and {op2.type}')
             elif operator == "!=":
+                if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition):
+                    return Value(InterpreterBase.TRUE_DEF, bool)
                 if (op1.type == int and op2.type == int) or \
                 (op1.type == str and op2.type == str) or \
                 (op1.type == bool and op2.type == bool):
                     return Value(str(op1_py_val != op2_py_val).lower(), bool)
-                if (op1.type == None and op2.type == None):
+                if (type(op1) == ObjectDefinition or op2.type == None ):
                     return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == None or op2.type == None):
                     return Value(InterpreterBase.TRUE_DEF, bool)
-                    
-                
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
+                if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition):
+                    return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == int and op2.type == int) or \
                 (op1.type == str and op2.type == str) or \
                 (op1.type == bool and op2.type == bool):
@@ -621,7 +626,7 @@ program_11 = [
     ')',
     '(method main ()',
         '(if (true)',
-            '(print (! (call me z)))',
+            '(print (== (new main) null))',
             ')',
         ')',
     ')',
