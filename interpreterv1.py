@@ -253,7 +253,7 @@ class ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
                 if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
+                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)) or (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     return Value(InterpreterBase.TRUE_DEF, bool)
                 if (op1.type == op2.type):
                     return Value(str(op1_py_val != op2_py_val).lower(), bool)
@@ -263,7 +263,7 @@ class ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
                 if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
+                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)) or (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == op2.type):
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
