@@ -168,15 +168,12 @@ class ObjectDefinition:
             
             if type(op1) == list:
                 op1 = self.__solve_expression(op1)
+            op1 = self.convert_value(op1, parameters)
             if operator == "!":
-                op1 = self.convert_value(op1, parameters)
                 if op1.type == bool:
                     return Value(str(not op1.get_pythonic_val()).lower(), bool)
                 
             if operator == InterpreterBase.NEW_DEF:
-                if op1 not in self.interpreter.classes:
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
-                op1 = self.convert_value(op1, parameters)
                 return op1.instantiate_object()
             
             
