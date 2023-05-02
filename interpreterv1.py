@@ -266,7 +266,7 @@ class ObjectDefinition:
                 if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == op2.type):
-                    return Value(str(op1_py_val == op2_py_val).lower(), bool)
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
                 if (op1.type == bool and op2.type == bool):
@@ -311,7 +311,7 @@ class ObjectDefinition:
             res = self.run_method(method, method_params)
             return res, False
         elif obj == InterpreterBase.NULL_DEF:
-            self.interpreter.error(ErrorType.TYPE_ERROR)
+            self.interpreter.error(ErrorType.FAULT_ERROR)
         else:
             if type(obj) == list:
                 obj = self.__solve_expression(obj, parameters)
@@ -324,7 +324,7 @@ class ObjectDefinition:
             else:
                 obj = self.fields[obj].value
                 if type(obj) != ObjectDefinition:
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                    self.interpreter.error(ErrorType.FAULT_ERROR)
 
 
             if method not in obj.methods:
