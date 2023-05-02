@@ -17,7 +17,6 @@ def convert_string_to_native_val(s):
     else:
         return False, Value(str(None), None)
     
-    
 class Interpreter(InterpreterBase):
     def __init__(self, console_output=True, inp=None, trace_output=False):
         self.classes = {}
@@ -190,7 +189,6 @@ class ObjectDefinition:
             operator, op1, op2 = expression
             if type(op1) == list:
                 op1 = self.__solve_expression(op1, parameters)
-
             if type(op2) == list:
                 op2 = self.__solve_expression(op2, parameters)
             op1 = self.convert_value(op1, parameters)
@@ -201,7 +199,6 @@ class ObjectDefinition:
                 op2_py_val = op2.get_pythonic_val()
             if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition) and operator not in ("==", "!="):
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'{operator} not supported between objects')
-
             if operator == "+":
                 if (op1.type == int and op2.type == int):
                     return Value(str(op1_py_val + op2_py_val), int)
@@ -216,7 +213,6 @@ class ObjectDefinition:
                 if (op1.type == int and op2.type == int):
                     return Value(str(op1_py_val * op2_py_val), int)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'* operator not supported between {op1.type} and {op2.type}')
-
             elif operator == "/":
                 if (op1.type == int and op2.type == int):
                     return Value(str(int(op1_py_val / op2_py_val)), int)
@@ -283,7 +279,6 @@ class ObjectDefinition:
                     return Value(InterpreterBase.TRUE_DEF, bool)
                 else:
                     return Value(InterpreterBase.FALSE_DEF, bool)
-
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
                 if (op1.type == bool and op2.type == bool):
@@ -314,7 +309,6 @@ class ObjectDefinition:
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
         self.interpreter.error(ErrorType.NAME_ERROR)
-
 
     def __execute_call_statement(self, statement, parameters = {}):
         _, obj, method, *method_params = statement
@@ -385,7 +379,6 @@ class ObjectDefinition:
                 res, exit_flag = self.__run_statement(false_exp[0], parameters)
                 return res, exit_flag
             return Value(InterpreterBase.NULL_DEF, None), exit_flag
-            
 
     def __execute_while_statement(self, statement, parameters = {}):
         _, cond_exp, exp = statement
@@ -395,7 +388,7 @@ class ObjectDefinition:
             self.interpreter.error(ErrorType.TYPE_ERROR)
         exit_flag = False
         res = Value(str(InterpreterBase.NULL_DEF), None)
-        while cond_res.get_pythonic_val() == True and not exit_flag:
+        while cond_res.get_pythonic_val() == True:
             res, exit_flag = self.__run_statement(exp, parameters)
             cond_res = self.__solve_expression(cond_exp, parameters)
             if exit_flag:
@@ -403,7 +396,6 @@ class ObjectDefinition:
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
-
 
     def __execute_inputi_statement(self, statement, parameters = {}):
         _, input_field = statement
