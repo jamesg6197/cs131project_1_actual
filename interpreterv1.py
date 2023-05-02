@@ -175,7 +175,7 @@ class ObjectDefinition:
                 
             if operator == InterpreterBase.NEW_DEF:
                 if op1 not in self.interpreter.classes:
-                    self.interpreter.error(ErrorType.NAME_ERROR)
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
                 op1 = self.convert_value(op1, parameters)
                 return op1.instantiate_object()
             
