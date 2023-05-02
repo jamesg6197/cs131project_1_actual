@@ -197,7 +197,9 @@ class ObjectDefinition:
                 op1_py_val = op1.get_pythonic_val()
             if type(op2) != ObjectDefinition:
                 op2_py_val = op2.get_pythonic_val()
-            
+            if type(op1) == ObjectDefinition or type(op2) == ObjectDefinition and operator not in ("==", "!="):
+                self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== {operator} not supported between objects')
+
             if operator == "+":
                 if (op1.type == int and op2.type == int):
                     return Value(str(op1_py_val + op2_py_val), int)
