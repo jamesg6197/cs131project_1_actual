@@ -348,7 +348,10 @@ class ObjectDefinition:
         return res, exit_flag
 
     def __execute_return_statement(self, statement, parameters = {}):
-        _, expression = statement
+        _, *expression = statement
+        if expression == []:
+            return Value(str(InterpreterBase.NULL_DEF), None), True
+    
         return_val = self.__solve_expression(expression, parameters)
         return return_val, True
     
@@ -664,6 +667,27 @@ program_11 = [
         ')',
     ')',
 ]
+
+program_12 = [
+
+
+	'(class main',
+         '(method foo (q) ',
+           '(while (> q 0)',
+                    '(if (== (% q 3) 0)',
+                        '(begin',
+                            '(return)  # immediately terminates loop and function foo',
+                            '(set q (- q 1))',
+                        ')',
+                    ')',
+           ')  ',
+         ')',
+         '(method main () ',
+           '(print (call me foo 5))',
+         ')',
+      ')',
+
+]
 interpreter = Interpreter()
 # interpreter.run(program_1) 
 # print()
@@ -677,4 +701,4 @@ interpreter = Interpreter()
 # interpreter.run(program_7)
 # print()
 #interpreter.run(program_10)
-interpreter.run(program_11)
+interpreter.run(program_12)
