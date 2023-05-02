@@ -170,8 +170,8 @@ class ObjectDefinition:
                 op1 = self.__solve_expression(op1)
             if operator == "!":
                 op1 = self.convert_value(op1, parameters)
-                if type(op1) == bool:
-                    return Value(str(not operator), bool)
+                if op1.type == bool:
+                    return Value(str(not operator).lower(), bool)
                 
             if operator == InterpreterBase.NEW_DEF:
                 if op1 not in self.interpreter.classes:
@@ -616,8 +616,8 @@ program_10 = ['(class person',
 program_11 = [
     '(class main',
     '(method main ()',
-        '(if (!= 1 null)',
-            '(print "hello")',
+        '(if (true)',
+            '(print (! false))',
             ')',
         ')',
     ')',
@@ -635,4 +635,4 @@ interpreter = Interpreter()
 # interpreter.run(program_7)
 # print()
 #interpreter.run(program_10)
-interpreter.run(program_4)
+interpreter.run(program_11)
