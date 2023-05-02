@@ -388,10 +388,10 @@ class ObjectDefinition:
         while cond_res.get_pythonic_val() == True and not exit_flag:
             res, exit_flag = self.__run_statement(exp, parameters)
             cond_res = self.__solve_expression(cond_exp, parameters)
-            if exit_flag:
-                return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
+            if exit_flag:
+                return res, exit_flag
         return res, exit_flag
 
 
