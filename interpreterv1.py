@@ -175,7 +175,7 @@ class ObjectDefinition:
                 
             if operator == InterpreterBase.NEW_DEF:
                 if op1 not in self.interpreter.classes:
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                    self.interpreter.error(ErrorType.NAME_ERROR)
                 op1 = self.convert_value(op1, parameters)
                 return op1.instantiate_object()
             
@@ -651,9 +651,9 @@ program_11 = [
     '(field p true)'
     '(method z ()',
         '(begin',
-            '(while (== (new person) null)'
-                '(return true)',
-            ')',
+            '(while (p)'
+                '(set p (new person))',
+            ')'
             '(return false)'
         ')',
     ')',
