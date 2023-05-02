@@ -142,7 +142,7 @@ class ObjectDefinition:
         result, _ = self.__run_statement(statement, parameters)
         return result
     
-    def convert_value(self, s, parameters):
+    def convert_value(self, s, parameters = {}):
         if type(s) == Value:
             return s
         convert_success, value= convert_string_to_native_val(s) 
@@ -265,7 +265,7 @@ class ObjectDefinition:
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'| operator not supported between {op1.type} and {op2.type}')
         self.interpreter.error(ErrorType.TYPE_ERROR)
 
-    def __execute_print_statement(self, statement, parameters):
+    def __execute_print_statement(self, statement, parameters = {}):
         args = statement[1:]
         args = [self.__solve_expression(arg, parameters).val for arg in args]
         output = "".join(args)
@@ -286,7 +286,7 @@ class ObjectDefinition:
         self.interpreter.error(ErrorType.NAME_ERROR)
 
 
-    def __execute_call_statement(self, statement, parameters):
+    def __execute_call_statement(self, statement, parameters = {}):
         _, obj, method, *method_params = statement
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
 
@@ -320,7 +320,7 @@ class ObjectDefinition:
             res = obj.run_method(method, method_params)
             return res, False
 
-    def __execute_all_sub_statements_of_begin_statement(self, statement, parameters):
+    def __execute_all_sub_statements_of_begin_statement(self, statement, parameters = {}):
         sub_statements = statement[1:]
         exit_flag = False
         for substatement in sub_statements:
@@ -329,12 +329,12 @@ class ObjectDefinition:
                 return res, exit_flag
         return res, exit_flag
 
-    def __execute_return_statement(self, statement, parameters):
+    def __execute_return_statement(self, statement, parameters = {}):
         _, expression = statement
         return_val = self.__solve_expression(expression, parameters)
         return return_val, True
     
-    def __execute_if_statement(self, statement, parameters):
+    def __execute_if_statement(self, statement, parameters = {}):
         _, cond_exp, true_exp, *false_exp, = statement
         cond_res = self.__solve_expression(cond_exp, parameters)
         if type(cond_res) != Value or cond_res.type != bool:
@@ -350,7 +350,7 @@ class ObjectDefinition:
             return Value(InterpreterBase.NULL_DEF, None), exit_flag
             
 
-    def __execute_while_statement(self, statement, parameters):
+    def __execute_while_statement(self, statement, parameters = {}):
         _, cond_exp, exp = statement
         
         cond_res = self.__solve_expression(cond_exp, parameters)
@@ -367,21 +367,21 @@ class ObjectDefinition:
         return res, exit_flag
 
 
-    def __execute_inputi_statement(self, statement, parameters):
+    def __execute_inputi_statement(self, statement, parameters = {}):
         _, input_field = statement
         user_input = self.interpreter.get_input()
         input_val = str(user_input)
         self.__execute_set_statement([InterpreterBase.SET_DEF, input_field, input_val], parameters)
         return Value(str(InterpreterBase.NULL_DEF), None), False
 
-    def __execute_inputs_statement(self, statement, parameters):
+    def __execute_inputs_statement(self, statement, parameters = {}):
         _, input_field = statement
         user_input = self.interpreter.get_input()
         input_val = '"' + user_input + '"'
         self.__execute_set_statement([InterpreterBase.SET_DEF, input_field, input_val], parameters)
         return Value(str(InterpreterBase.NULL_DEF), None), False
 
-    def __run_statement(self, statement, parameters):
+    def __run_statement(self, statement, parameters = {}):
         result = Value(str(InterpreterBase.NULL_DEF), None)
         if is_a_print_statement(statement):
             result, exit_flag = self.__execute_print_statement(statement, parameters)
