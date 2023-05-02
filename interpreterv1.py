@@ -7,7 +7,7 @@ def convert_string_to_native_val(s):
     if check_int(s): 
         return True, Value(str(int(s)), int)
     elif check_string(s):
-        return True, Value(s.strip('"'), str)
+        return True, Value(s[1:-1], str)
     elif check_bool(s):
         if s == 'true':
             return True, Value(str(True).lower(), bool)
@@ -171,7 +171,7 @@ class ObjectDefinition:
                 return op1.instantiate_object()
             
         elif expression[0] == InterpreterBase.CALL_DEF:
-            res = self.__execute_call_statement(expression, parameters)
+            res, _ = self.__execute_call_statement(expression, parameters)
             return res
         
         elif len(expression) == 3:
@@ -273,15 +273,13 @@ class ObjectDefinition:
 
     def __execute_call_statement(self, statement, parameters):
         _, obj, method, *method_params = statement
-        method_params = [self.__solve_expression(param, parameters).val for param in method_params]
-
         if obj == InterpreterBase.ME_DEF:
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
-
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
+            print(method_params)
             res = self.run_method(method, method_params)
-            return res
+            return res, False
 
         else:
             if obj not in self.fields:
@@ -296,7 +294,7 @@ class ObjectDefinition:
             
             method_params = {obj.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
             res = obj.run_method(method, method_params)
-            return res
+            return res, False
 
     def __execute_all_sub_statements_of_begin_statement(self, statement, parameters):
         sub_statements = statement[1:]
@@ -534,6 +532,61 @@ program_8 = ['(class main',
   ')',
   '(method main () (print (call me fact 5)))',
 ')',]
+
+program_9 = ['(class person',
+   '(field name "")',
+   '(field age 0)',
+   '(method init (n a) (begin (set name n) (set age a)))',
+   '(method talk (to_whom) (print name " says hello to " to_whom))',
+   '(method get_age () (return age))',
+')',
+'(class main',
+ '(field p null)',
+ '(method tell_joke (to_whom) (print "Hey " to_whom ", knock knock!"))',
+ '(method main ()',
+   '(begin',
+      '(call me tell_joke "Leia")  # calling method in the current obj',
+      '(set p (new person))    ',
+      '(call p init "Siddarth" 25)  # calling method in other object',
+      '(call p talk "Boyan")        # calling method in other object',
+      '(print "Siddarth\'s age is " (call p get_age))',
+   ')',
+ ')',
+')',
+]
+
+
+
+program_10 = ['(class person',
+         '(field name "")',
+         '(field age 0)',
+         '(method init (n a)',
+            '(begin',
+              '(set name n)',
+              '(set age a)',
+            ')',
+         ')',
+         
+         '(method talk (to_whom)',
+            '(print name " says hello to " to_whom)',
+         ')',
+      ')',
+
+'(class main',
+ '(field p null)',
+ '(method tell_joke (to_whom)',
+    '(print "Hey " to_whom ", knock knock!")',
+ ')',
+ '(method main ()',
+   '(begin',
+      '(call me tell_joke "Matt") # call tell_joke in current object',
+      '(set p (new person))  # allocate a new person obj, point p at it',
+      '(call p init "Siddarth" 25) # call init in object pointed to by p',
+      '(call p talk "Paul")       # call talk in object pointed to by p',
+   ')',
+ ')',
+')',
+]
 interpreter = Interpreter()
 # interpreter.run(program_1) 
 # print()
@@ -546,4 +599,4 @@ interpreter = Interpreter()
 #interpreter.run(program_6)
 # interpreter.run(program_7)
 # print()
-# interpreter.run(program_8)
+interpreter.run(program_10)
