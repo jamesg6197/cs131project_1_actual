@@ -60,7 +60,6 @@ class Interpreter(InterpreterBase):
                         super().error(ErrorType.NAME_ERROR)
                     c_def.add_method(name, parameters, statement)
 
-
             self.classes[class_name] = c_def
 
 class Value:
@@ -290,6 +289,7 @@ class ObjectDefinition:
     def __execute_call_statement(self, statement, parameters):
         _, obj, method, *method_params = statement
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
+
         if obj == InterpreterBase.ME_DEF:
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
@@ -299,10 +299,13 @@ class ObjectDefinition:
         elif obj == InterpreterBase.NULL_DEF:
             self.interpreter.error(ErrorType.FAULT_ERROR)
         else:
-            if obj not in self.fields:
+            if type(obj) == list:
+                obj = self.__solve_expression(obj, parameters)
+            elif obj not in self.fields:
                 self.interpreter.error(ErrorType.NAME_ERROR)
 
-            obj = self.fields[obj].value
+            else:
+                obj = self.fields[obj].value
             if method not in obj.methods:
                 self.interpreter.error(ErrorType.NAME_ERROR)
 
@@ -471,9 +474,8 @@ program_4 = ['(class person',
                         '(set x "foobar")		# setting field to a string constant',	 
                         '#(set x (* x 5))		 setting field to result of expression',
                         '(set x (new person))	# setting field to refer to new object',
-                        '(set x null)			# setting field to null',
-                        '(print q)',
-                        ')',
+                        '(call (new person) talk "James")',
+                    ')',
                     ')',
                 '(method main () ',
                     '(call me foo 5)',
