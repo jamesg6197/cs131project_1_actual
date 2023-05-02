@@ -17,6 +17,7 @@ def convert_string_to_native_val(s):
     else:
         return False, Value(str(None), None)
     
+    
 class Interpreter(InterpreterBase):
     def __init__(self, console_output=True, inp=None, trace_output=False):
         self.classes = {}
@@ -189,6 +190,7 @@ class ObjectDefinition:
             operator, op1, op2 = expression
             if type(op1) == list:
                 op1 = self.__solve_expression(op1, parameters)
+
             if type(op2) == list:
                 op2 = self.__solve_expression(op2, parameters)
             op1 = self.convert_value(op1, parameters)
@@ -199,6 +201,7 @@ class ObjectDefinition:
                 op2_py_val = op2.get_pythonic_val()
             if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition) and operator not in ("==", "!="):
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'{operator} not supported between objects')
+
             if operator == "+":
                 if (op1.type == int and op2.type == int):
                     return Value(str(op1_py_val + op2_py_val), int)
@@ -213,6 +216,7 @@ class ObjectDefinition:
                 if (op1.type == int and op2.type == int):
                     return Value(str(op1_py_val * op2_py_val), int)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'* operator not supported between {op1.type} and {op2.type}')
+
             elif operator == "/":
                 if (op1.type == int and op2.type == int):
                     return Value(str(int(op1_py_val / op2_py_val)), int)
@@ -242,34 +246,23 @@ class ObjectDefinition:
                     return Value(str(op1_py_val >= op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'>= operator not supported between {op1.type} and {op2.type}')
             elif operator == "!=":
-                if type(op1) == ObjectDefinition:
-                    if type(op2) == Value and op2.type is not None:
-                        self.interpreter.error(ErrorType.TYPE_ERROR)
-                elif type(op2) == ObjectDefinition:
-                    if type(op1) == Value and op1.type is not None:
-                        self.interpreter.error(ErrorType.TYPE_ERROR)
-                elif op1.type == int and op2.type == int or \
-                    op1.type == str and op2.type == str or \
-                    op1.type == bool and op2.type == bool:
-                        return Value(str(op1_py_val != op2_py_val).lower(), bool)
-                elif op1.type is None or op2.type is None:
+                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                if (op1.type == op2.type):
+                    return Value(str(op1_py_val != op2_py_val).lower(), bool)
+                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.TRUE_DEF, bool)
-                else:
-                    return Value(InterpreterBase.FALSE_DEF, bool)
-
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
-                if type(op1) == ObjectDefinition:
-                    if type(op2) == Value and op2.type is not None:
-                        self.interpreter.error(ErrorType.TYPE_ERROR)
-                elif type(op2) == ObjectDefinition:
-                    if type(op1) == Value and op1.type is not None:
-                        self.interpreter.error(ErrorType.TYPE_ERROR)
-                elif op1.type == op2.type:
-                    return Value(str(op1_py_val == op2_py_val).lower(), bool)
-                elif op1.type is None and op2.type is None:
-                    return Value(InterpreterBase.TRUE_DEF, bool)
-                else:
+                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                if (op1.type == op2.type):
+                    return Value(str(op1_py_val != op2_py_val).lower(), bool)
+                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.FALSE_DEF, bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
@@ -301,6 +294,7 @@ class ObjectDefinition:
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
         self.interpreter.error(ErrorType.NAME_ERROR)
+
 
     def __execute_call_statement(self, statement, parameters = {}):
         _, obj, method, *method_params = statement
@@ -371,6 +365,7 @@ class ObjectDefinition:
                 res, exit_flag = self.__run_statement(false_exp[0], parameters)
                 return res, exit_flag
             return Value(InterpreterBase.NULL_DEF, None), exit_flag
+            
 
     def __execute_while_statement(self, statement, parameters = {}):
         _, cond_exp, exp = statement
@@ -380,14 +375,17 @@ class ObjectDefinition:
             self.interpreter.error(ErrorType.TYPE_ERROR)
         exit_flag = False
         res = Value(str(InterpreterBase.NULL_DEF), None)
-        while cond_res.get_pythonic_val() == True:
+        while cond_res.get_pythonic_val() == True and not exit_flag:
             res, exit_flag = self.__run_statement(exp, parameters)
             cond_res = self.__solve_expression(cond_exp, parameters)
             if exit_flag:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
+        if type(cond_res) != Value or cond_res.type != bool:
+                self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
+
 
     def __execute_inputi_statement(self, statement, parameters = {}):
         _, input_field = statement
@@ -424,257 +422,13 @@ class ObjectDefinition:
         elif is_a_begin_statement(statement):
             result, exit_flag = self.__execute_all_sub_statements_of_begin_statement(statement, parameters)
         return result, exit_flag
-
-
-
-program_1 = ['(class main',
-                    ' (field x 2)'
-                    ' (field y "6")'
-                    ' (method helloworld ()',
-                    '   (begin',
-                    '       (print "My boy")',
-                    '       (set y "final value")',
-                    '   )',
-                    ')',
-                    ' (method main ()',
-                    '   (begin',
-                    '       (print "hello")',
-                    '       (set x 69)',
-                    '       (set y "food!")',
-                    '       (print "hello world!" 7 (+ x 69))',
-                    '       (print (+ y " niawoid"))',
-                    '       (call me helloworld)'
-                    '       (print y)',
-                    '   )',
-                    ' ) # end of method',
-                    ') # end of class']
-
-program_2 = ['(class main',
-                '(field other null)',
-                '(field result 0)',
-                '(method main ()',
-                    '(begin',
-                        '(call me foo 10 20)   # call foo method in same object',
-                        '(set other (new other_class))',
-                        '(call other foo 5 6)  # call foo method in other object',
-                        '(print "square: " (call other square 10)) # call expression',
-                        ')',
-                    ')',
-                '(method foo (a b)',
-                    '(print a b)',
-                ')',
-                ')',
-            '(class other_class',
-                    '(method foo (q r) (print q r))',
-                    '(method square (q) (return (* q q)))',
-                ')',
-            ]
-
-program_3 = ['(class main',
-                '(field x 0)',
-                '(method main ()',
-                    '(begin',
-                        '(set x 7)	# input value from user, store in x variable',
-                        '(if (== 0 (% x 2))',
-                            '(print "x is even")',
-                            '(print "x is odd")   # else clause',
-                        ')',       
-                        '(if (== x 7)',
-                            '(print "lucky seven")  # no else clause in this version',
-                        ')',  
-                        '(if true (print "that\'s true") (print "this won\'t print"))',
-                        ')',
-                    ')',
-                ')',]
-
-program_4 = ['(class person',
-                '(field name "")',
-                '(field age 0)',
-                '(method init (n a) (begin (set name n) (set age a)))',
-                '(method talk (to_whom) (print name " says hello to " to_whom))',
-                    ')',
-
-            '(class main',
-                '(field x 0)',
-                '(method foo (q)',
-                    '(begin',
-                        '(set x 10)	 		# setting field to integer constant',
-                        '(set q true)			# setting parameter to boolean constant', 
-                        '(set x "foobar")		# setting field to a string constant',	 
-                        '#(set x (* x 5))		 setting field to result of expression',
-                        '(set x (new person))	# setting field to refer to new object',
-                        '(call (new person) talk "James")',
-                    ')',
-                    ')',
-                '(method main () ',
-                    '(call me foo 5)',
-                    ')',                
-                ')',
-            ]
-
-program_5 = ['(class main',
-                '(field x 0)',
-                '(method main () ',
-                    '(begin',
-                        '(inputi x)',	 
-                        '(while (> x 0) ',
-                            '(begin',
-                                '(print "x is " x)',
-                                '(set x (- x 1))',
-                                ')',
-                            ')',          
-                        ')',
-                    ')',
-                ')',
-            ]
-
-program_6 = ['(class main',
-                '# private member fields',
-                '(field num true)',
-                '(field result "hello")',
-
-                '# public methods',
-                '(method main ()',
-                    '(begin',
-                        '(print "Enter a number: ")',
-                        '(inputi num)',
-                        '(print num " factorial is " (call me factorial))',
-                        ')',
-                    ')',
-                '(method factorial ()',
-                    '(begin',
-                        '(set result 1)',
-                        '(while (== (& true true) false)',
-                            '(begin',
-                                '(set result (* num result))',
-                                '(set num (- num 1))',
-                                ')',
-                            ')',
-                        '(return result)',
-                        ')',
-                    ')'
-                ')']
-
-program_7 = ['(class main',
- '(field x 0)',
- '(field y "test")',
- '(method main ()',
-  '(begin',
-   '(inputi x)',
-   '(print x)',
-   '(inputi y)',
-   '(print y)',
-  ')',
- ')',
-')',]
-program_8 = ['(class main',
-  '(method fact (n)',
-   '(if (== n 1)',
-     '(begin',
-        '(return 1)',
-        '(print "this should not be printed")'
-        '(return 1)',
-     ')',
-     '(return (* n (call me fact (- n 1))))',
-   ')',
-  ')',
-  '(method main () (print (call me fact 5)))',
-')',]
-
-program_9 = ['(class person',
-   '(field name "")',
-   '(field age 0)',
-   '(method init (n a) (begin (set name n) (set age a)))',
-   '(method talk (to_whom) (print name " says hello to " to_whom))',
-   '(method get_age () (return age))',
-')',
-'(class main',
- '(field p null)',
- '(method tell_joke (to_whom) (print "Hey " to_whom ", knock knock!"))',
- '(method main ()',
-   '(begin',
-      '(call me tell_joke "Leia")  # calling method in the current obj',
-      '(set p (new person))    ',
-      '(call p init "Siddarth" 25)  # calling method in other object',
-      '(call p talk "Boyan")        # calling method in other object',
-      '(print "Siddarth\'s age is " (call p get_age))',
-   ')',
- ')',
-')',
-]
-
-
-
-program_10 = ['(class person',
-         '(field name "")',
-         '(field age 0)',
-         '(method init (n a)',
-            '(begin',
-              '(set name n)',
-              '(set age a)',
-            ')',
-         ')',
-         
-         '(method talk (to_whom)',
-            '(print name " says hello to " to_whom)',
-         ')',
-      ')',
-
-'(class main',
- '(field p null)',
- '(method tell_joke (to_whom)',
-    '(print "Hey " to_whom ", knock knock!")',
- ')',
- '(method main ()',
-   '(begin',
-      '(call me tell_joke "Matt") # call tell_joke in current object',
-      '(set p (new person))  # allocate a new person obj, point p at it',
-      '(call p init "Siddarth" 25) # call init in object pointed to by p',
-      '(call p talk "Paul")       # call talk in object pointed to by p',
-      '(print (null))',
-   ')',
- ')',
-')',
-]
-program_11 = [
-    '(class person',
-         '(field name "")',
-         '(field age 0)',
-         '(method init (n a)',
-            '(begin',
-              '(set name n)',
-              '(set age a)',
-            ')',
-         ')',
-         
-         '(method talk (to_whom)',
-            '(print name " says hello to " to_whom)',
-         ')',
-      ')',
-    '(class main',
-    '(field p null)'
-    '(method z ()',
-        '(begin',
-            '(while (== z null)'
-                '(set p (new person))',
-            ')'
-            '(return false)'
-        ')',
-    ')',
-    '(method main ()',
-        '(if (true)',
-            '(print (call p z))',
-            ')',
-        ')',
-    ')',
-]
-
+    
 program_12 = [
 
 
 	'(class main',
          '(method foo (q) ',
-           '(while (! true)',
+           '(while (== 7 null)',
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
