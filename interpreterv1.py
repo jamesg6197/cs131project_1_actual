@@ -634,7 +634,7 @@ program_11 = [
     ')',
     '(method main ()',
         '(if (true)',
-            '(print (== (new main) "string"))',
+            '(print (== "strin" "string"))',
             ')',
         ')',
     ')',
