@@ -153,7 +153,7 @@ class ObjectDefinition:
             return self.fields[s].value
         if s in self.interpreter.classes:
             return self.interpreter.classes[s]
-        self.interpreter.error(ErrorType.TYPE_ERROR, f'{s} is not defined')
+        self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
 
     def __solve_expression(self, expression, parameters = {}):
         if type(expression) != list:
@@ -245,13 +245,9 @@ class ObjectDefinition:
                 if type(op1) == ObjectDefinition:
                     if type(op2) == Value and op2.type is not None:
                         self.interpreter.error(ErrorType.TYPE_ERROR)
-                    if type(op2) == ObjectDefinition or op2.type is None:
-                        return Value(InterpreterBase.TRUE_DEF, bool)
                 elif type(op2) == ObjectDefinition:
                     if type(op1) == Value and op1.type is not None:
                         self.interpreter.error(ErrorType.TYPE_ERROR)
-                    if type(op1) == ObjectDefinition or op1.type is None:
-                        return Value(InterpreterBase.TRUE_DEF, bool)
                 elif op1.type == int and op2.type == int or \
                     op1.type == str and op2.type == str or \
                     op1.type == bool and op2.type == bool:
@@ -266,13 +262,9 @@ class ObjectDefinition:
                 if type(op1) == ObjectDefinition:
                     if type(op2) == Value and op2.type is not None:
                         self.interpreter.error(ErrorType.TYPE_ERROR)
-                    elif type(op2) == ObjectDefinition:
-                        return Value(InterpreterBase.FALSE_DEF, bool)
                 elif type(op2) == ObjectDefinition:
                     if type(op1) == Value and op1.type is not None:
                         self.interpreter.error(ErrorType.TYPE_ERROR)
-                    elif type(op1) == ObjectDefinition:
-                        return Value(InterpreterBase.FALSE_DEF, bool)
                 elif op1.type == op2.type:
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
                 elif op1.type is None and op2.type is None:
