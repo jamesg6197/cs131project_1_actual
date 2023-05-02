@@ -653,7 +653,7 @@ program_11 = [
          ')',
       ')',
     '(class main',
-    '(field p true)'
+    '(field p null)'
     '(method z ()',
         '(begin',
             '(while (p)'
@@ -664,7 +664,7 @@ program_11 = [
     ')',
     '(method main ()',
         '(if (true)',
-            '(print (call me z))',
+            '(print (call p z))',
             ')',
         ')',
     ')',
