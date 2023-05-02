@@ -9,7 +9,7 @@ def convert_string_to_native_val(s):
     elif check_string(s):
         return True, Value(s[1:-1], str)
     elif check_bool(s):
-        if s == 'true':
+        if s == InterpreterBase.TRUE_DEF:
             return True, Value(InterpreterBase.TRUE_DEF, bool)
         return True, Value(InterpreterBase.FALSE_DEF, bool)
     elif check_null(s):
@@ -380,7 +380,6 @@ class ObjectDefinition:
             
 
     def __execute_while_statement(self, statement, parameters = {}):
-        self.interpreter.error(ErrorType.TYPE_ERROR)
         _, cond_exp, exp = statement
         
         cond_res = self.__solve_expression(cond_exp, parameters)
@@ -394,6 +393,8 @@ class ObjectDefinition:
             if exit_flag:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
+                self.interpreter.error(ErrorType.TYPE_ERROR)
+        if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
@@ -552,7 +553,7 @@ program_6 = ['(class main',
                 '(method factorial ()',
                     '(begin',
                         '(set result 2)',
-                        '(while  (new main))',
+                        '(while (new method)',
                             '(begin',
                                 '(set result (* num result))',
                                 '(set num (- num 1))',
@@ -697,7 +698,7 @@ program_12 = [
       ')',
 
 ]
-#interpreter = Interpreter()
+interpreter = Interpreter()
 # # interpreter.run(program_1) 
 # # print()
 # # interpreter.run(program_2) 
@@ -711,4 +712,4 @@ program_12 = [
 # # print()
 # #interpreter.run(program_10)
 # #
-#interpreter.run(program_6)
+interpreter.run(program_6)
