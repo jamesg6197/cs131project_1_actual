@@ -246,20 +246,25 @@ class ObjectDefinition:
                     return Value(str(op1_py_val >= op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'>= operator not supported between {op1.type} and {op2.type}')
             elif operator == "!=":
-                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition):
+                if type(op1) == ObjectDefinition:
+                    if type(op2) == Value and op2.type is not None:
+                        self.interpreter.error(ErrorType.TYPE_ERROR)
+                    if type(op2) == ObjectDefinition or op2.type is None:
+                        return Value(InterpreterBase.TRUE_DEF, bool)
+                elif type(op2) == ObjectDefinition:
+                    if type(op1) == Value and op1.type is not None:
+                        self.interpreter.error(ErrorType.TYPE_ERROR)
+                    if type(op1) == ObjectDefinition or op1.type is None:
+                        return Value(InterpreterBase.TRUE_DEF, bool)
+                elif op1.type == int and op2.type == int or \
+                    op1.type == str and op2.type == str or \
+                    op1.type == bool and op2.type == bool:
+                        return Value(str(op1_py_val != op2_py_val).lower(), bool)
+                elif op1.type is None or op2.type is None:
                     return Value(InterpreterBase.TRUE_DEF, bool)
-                if (op1.type == int and op2.type == int) or \
-                (op1.type == str and op2.type == str) or \
-                (op1.type == bool and op2.type == bool):
-                    return Value(str(op1_py_val != op2_py_val).lower(), bool)
-                if (type(op1) == ObjectDefinition or op2.type == None ):
+                else:
                     return Value(InterpreterBase.FALSE_DEF, bool)
-                if (op1.type == None or op2.type == None):
-                    return Value(InterpreterBase.TRUE_DEF, bool)
+
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
                 if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
@@ -393,8 +398,6 @@ class ObjectDefinition:
             if exit_flag:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
-        if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
