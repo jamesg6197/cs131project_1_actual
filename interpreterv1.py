@@ -267,20 +267,23 @@ class ObjectDefinition:
 
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
-                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition):
-                    return Value(InterpreterBase.FALSE_DEF, bool)
-                if (op1.type == int and op2.type == int) or \
-                (op1.type == str and op2.type == str) or \
-                (op1.type == bool and op2.type == bool):
+                if type(op1) == ObjectDefinition:
+                    if type(op2) == Value and op2.type is not None:
+                        self.interpreter.error(ErrorType.TYPE_ERROR)
+                    elif type(op2) == ObjectDefinition:
+                        return Value(InterpreterBase.FALSE_DEF, bool)
+                elif type(op2) == ObjectDefinition:
+                    if type(op1) == Value and op1.type is not None:
+                        self.interpreter.error(ErrorType.TYPE_ERROR)
+                    elif type(op1) == ObjectDefinition:
+                        return Value(InterpreterBase.FALSE_DEF, bool)
+                elif op1.type == op2.type:
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
-                if (op1.type == None and op2.type == None):
+                elif op1.type is None and op2.type is None:
                     return Value(InterpreterBase.TRUE_DEF, bool)
-                elif (op1.type == None or op2.type == None):
+                else:
                     return Value(InterpreterBase.FALSE_DEF, bool)
+
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
                 if (op1.type == bool and op2.type == bool):
