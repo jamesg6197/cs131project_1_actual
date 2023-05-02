@@ -375,6 +375,7 @@ class ObjectDefinition:
         if type(cond_res) != Value or cond_res.type != bool:
             self.interpreter.error(ErrorType.TYPE_ERROR)
         exit_flag = False
+        res = Value(str(InterpreterBase.NULL_DEF), None)
         while cond_res.get_pythonic_val() == True and not exit_flag:
             res, exit_flag = self.__run_statement(exp, parameters)
             cond_res = self.__solve_expression(cond_exp, parameters)
@@ -533,16 +534,16 @@ program_6 = ['(class main',
                     '(begin',
                         '(print "Enter a number: ")',
                         '(inputi num)',
-                        '(print num " factorial is " (call me factorial num))',
+                        '(print num " factorial is " (call me factorial))',
                         ')',
                     ')',
-                '(method factorial (n)',
+                '(method factorial ()',
                     '(begin',
                         '(set result 1)',
-                        '(while (> n 0)',
+                        '(while (> num 0)',
                             '(begin',
-                                '(set result (* n result))',
-                                '(set n (- n 1))',
+                                '(set result (* num result))',
+                                '(set num (- num 1))',
                                 ')',
                             ')',
                         '(return result)',
@@ -632,14 +633,33 @@ program_10 = ['(class person',
 ')',
 ]
 program_11 = [
+    '(class person',
+         '(field name "")',
+         '(field age 0)',
+         '(method init (n a)',
+            '(begin',
+              '(set name n)',
+              '(set age a)',
+            ')',
+         ')',
+         
+         '(method talk (to_whom)',
+            '(print name " says hello to " to_whom)',
+         ')',
+      ')',
     '(class main',
     '(field p true)'
     '(method z ()',
-        '(return true)',
+        '(begin',
+            '(while (== (new person) null)'
+                '(return true)',
+            ')',
+            '(return false)'
+        ')',
     ')',
     '(method main ()',
         '(if (true)',
-            '(print ()))',
+            '(print (call me z))',
             ')',
         ')',
     ')',
