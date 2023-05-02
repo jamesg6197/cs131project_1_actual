@@ -273,6 +273,7 @@ class ObjectDefinition:
 
     def __execute_call_statement(self, statement, parameters):
         _, obj, method, *method_params = statement
+        method_params = [self.__solve_expression(param, parameters) for param in method_params]
         if obj == InterpreterBase.ME_DEF:
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
