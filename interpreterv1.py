@@ -170,6 +170,7 @@ class ObjectDefinition:
             if operator == InterpreterBase.NEW_DEF:
                 return op1.instantiate_object()
             
+            
         elif expression[0] == InterpreterBase.CALL_DEF:
             res, _ = self.__execute_call_statement(expression, parameters)
             return res
@@ -257,7 +258,7 @@ class ObjectDefinition:
 
     def __execute_print_statement(self, statement, parameters):
         args = statement[1:]
-        args = [self.__solve_expression(arg, parameters).val for arg in args]
+        args = [str(self.__solve_expression(arg, parameters).get_pythonic_val()) for arg in args]
         output = "".join(args)
         self.interpreter.output(output)
         return Value(str(InterpreterBase.NULL_DEF), None), False
@@ -588,6 +589,7 @@ program_10 = ['(class person',
       '(set p (new person))  # allocate a new person obj, point p at it',
       '(call p init "Siddarth" 25) # call init in object pointed to by p',
       '(call p talk "Paul")       # call talk in object pointed to by p',
+      '(print (null))',
    ')',
  ')',
 ')',
@@ -614,4 +616,4 @@ interpreter = Interpreter()
 # interpreter.run(program_7)
 # print()
 #interpreter.run(program_10)
-interpreter.run(program_11)
+interpreter.run(program_10)
