@@ -56,7 +56,7 @@ class Interpreter(InterpreterBase):
 
                 elif item[0] == InterpreterBase.METHOD_DEF:
                     name, parameters, statement = item[1:]
-                    if name in c_def.fields:
+                    if name in c_def.methods:
                         super().error(ErrorType.NAME_ERROR)
                     c_def.add_method(name, parameters, statement)
 
