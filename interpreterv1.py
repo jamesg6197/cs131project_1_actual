@@ -166,15 +166,18 @@ class ObjectDefinition:
         
         elif len(expression) == 2:
             operator, op1 = expression
+            
             if type(op1) == list:
                 op1 = self.__solve_expression(op1)
-
-            op1 = self.convert_value(op1, parameters)
             if operator == "!":
+                op1 = self.convert_value(op1, parameters)
                 if type(op1) == bool:
                     return Value(str(not operator), bool)
                 
             if operator == InterpreterBase.NEW_DEF:
+                if op1 not in self.interpreter.classes:
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                op1 = self.convert_value(op1, parameters)
                 return op1.instantiate_object()
             
             
@@ -277,7 +280,7 @@ class ObjectDefinition:
             parameters[var_name] = var_val
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
-        elif var_name in self.fields:
+        if var_name in self.fields:
             self.fields[var_name].value = var_val
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
@@ -293,7 +296,7 @@ class ObjectDefinition:
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
             res = self.run_method(method, method_params)
             return res, False
-        elif obj == 'null':
+        elif obj == InterpreterBase.NULL_DEF:
             self.interpreter.error(ErrorType.FAULT_ERROR)
         else:
             if obj not in self.fields:
@@ -469,7 +472,7 @@ program_4 = ['(class person',
                         '#(set x (* x 5))		 setting field to result of expression',
                         '(set x (new person))	# setting field to refer to new object',
                         '(set x null)			# setting field to null',
-                        '(print x)',
+                        '(print q)',
                         ')',
                     ')',
                 '(method main () ',
@@ -624,4 +627,4 @@ interpreter = Interpreter()
 # interpreter.run(program_7)
 # print()
 #interpreter.run(program_10)
-interpreter.run(program_10)
+interpreter.run(program_4)
