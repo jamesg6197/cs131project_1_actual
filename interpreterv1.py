@@ -155,7 +155,7 @@ class ObjectDefinition:
             return self.convert_value(expression, parameters)
         
         if len(expression) == 1:
-            return self.convert_value(expression[0])
+            return self.convert_value(expression[0], parameters)
         
         elif len(expression) == 2:
             operator, op1 = expression
@@ -587,6 +587,15 @@ program_10 = ['(class person',
  ')',
 ')',
 ]
+program_11 = [
+    '(class main',
+    '(method main ()',
+        '(if (true)',
+            '(print "hello")',
+            ')',
+        ')',
+    ')',
+]
 interpreter = Interpreter()
 # interpreter.run(program_1) 
 # print()
@@ -599,4 +608,5 @@ interpreter = Interpreter()
 #interpreter.run(program_6)
 # interpreter.run(program_7)
 # print()
-interpreter.run(program_10)
+#interpreter.run(program_10)
+interpreter.run(program_11)
