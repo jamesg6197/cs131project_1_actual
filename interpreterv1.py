@@ -170,6 +170,8 @@ class ObjectDefinition:
                 op1 = self.__solve_expression(op1)
             if operator == "!":
                 op1 = self.convert_value(op1, parameters)
+                if type(op1) != Value:
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
                 if op1.type == bool:
                     return Value(str(not op1.get_pythonic_val()).lower(), bool)
                 
@@ -388,10 +390,10 @@ class ObjectDefinition:
         while cond_res.get_pythonic_val() == True and not exit_flag:
             res, exit_flag = self.__run_statement(exp, parameters)
             cond_res = self.__solve_expression(cond_exp, parameters)
-            if type(cond_res) != Value or cond_res.type != bool:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
             if exit_flag:
                 return res, exit_flag
+            if type(cond_res) != Value or cond_res.type != bool:
+                self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
 
@@ -536,7 +538,7 @@ program_5 = ['(class main',
 program_6 = ['(class main',
                 '# private member fields',
                 '(field num 0)',
-                '(field result 1)',
+                '(field result "hello")',
 
                 '# public methods',
                 '(method main ()',
@@ -548,8 +550,8 @@ program_6 = ['(class main',
                     ')',
                 '(method factorial ()',
                     '(begin',
-                        '(set result 1)',
-                        '(while (> num 0)',
+                        '(set result 2)',
+                        '(while (! (new main))',
                             '(begin',
                                 '(set result (* num result))',
                                 '(set num (- num 1))',
@@ -660,7 +662,7 @@ program_11 = [
     '(field p null)'
     '(method z ()',
         '(begin',
-            '(while (== p null)'
+            '(while (== z null)'
                 '(set p (new person))',
             ')'
             '(return false)'
@@ -694,7 +696,7 @@ program_12 = [
       ')',
 
 ]
-# interpreter = Interpreter()
+interpreter = Interpreter()
 # # interpreter.run(program_1) 
 # # print()
 # # interpreter.run(program_2) 
@@ -708,4 +710,4 @@ program_12 = [
 # # print()
 # #interpreter.run(program_10)
 # #
-# interpreter.run(program_11)
+interpreter.run(program_6)
