@@ -694,18 +694,18 @@ program_12 = [
       ')',
 
 ]
-interpreter = Interpreter()
-# interpreter.run(program_1) 
-# print()
-# interpreter.run(program_2) 
-# print()
-# interpreter.run(program_3)
-# print()
-# interpreter.run(program_4)
-# print()
-#interpreter.run(program_6)
-# interpreter.run(program_7)
-# print()
-#interpreter.run(program_10)
-#
-interpreter.run(program_11)
+# interpreter = Interpreter()
+# # interpreter.run(program_1) 
+# # print()
+# # interpreter.run(program_2) 
+# # print()
+# # interpreter.run(program_3)
+# # print()
+# # interpreter.run(program_4)
+# # print()
+# #interpreter.run(program_6)
+# # interpreter.run(program_7)
+# # print()
+# #interpreter.run(program_10)
+# #
+# interpreter.run(program_11)
