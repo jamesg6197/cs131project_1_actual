@@ -161,6 +161,8 @@ class ObjectDefinition:
             return self.convert_value(expression, parameters)
         
         if len(expression) == 1:
+            if type(expression[0]) == list:
+                expression[0] = self.__solve_expression(expression[0])
             return self.convert_value(expression[0], parameters)
         
         elif len(expression) == 2:
@@ -168,6 +170,7 @@ class ObjectDefinition:
             
             if type(op1) == list:
                 op1 = self.__solve_expression(op1)
+
             if operator == "!":
                 op1 = self.convert_value(op1, parameters)
                 if type(op1) != Value:
@@ -428,7 +431,7 @@ program_12 = [
 
 	'(class main',
          '(method foo (q) ',
-           '(while (== 7 null)',
+           '(while ((== null null))',
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
@@ -443,7 +446,7 @@ program_12 = [
       ')',
 
 ]
-# interpreter = Interpreter()
+##interpreter = Interpreter()
 # # # interpreter.run(program_1) 
 # # # print()
 # # # interpreter.run(program_2) 
@@ -457,4 +460,4 @@ program_12 = [
 # # # print()
 # # #interpreter.run(program_10)
 # # #
-# interpreter.run(program_12)
+interpreter.run(program_12)
