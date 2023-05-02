@@ -36,7 +36,7 @@ class Interpreter(InterpreterBase):
     def __find_definition_for_class(self, class_name):
         if class_name in self.classes:
             return self.classes[class_name]
-        super().error(ErrorType.NAME_ERROR)
+        super().error(ErrorType.TYPE_ERROR)
 
     def __discover_all_classes_and_track_them(self, parsed_program):
          for class_def in parsed_program:
@@ -48,7 +48,7 @@ class Interpreter(InterpreterBase):
                 if item[0] == InterpreterBase.FIELD_DEF:
                     name, value = item[1:]
                     if name in c_def.fields:
-                        super().error(ErrorType.NAME_ERROR)
+                        super().error(ErrorType.TYPE_ERROR)
                     convert_success, value = convert_string_to_native_val(value)
                     if not convert_success:
                         super().error(ErrorType.TYPE_ERROR)
@@ -57,7 +57,7 @@ class Interpreter(InterpreterBase):
                 elif item[0] == InterpreterBase.METHOD_DEF:
                     name, parameters, statement = item[1:]
                     if name in c_def.methods:
-                        super().error(ErrorType.NAME_ERROR)
+                        super().error(ErrorType.TYPE_ERROR)
                     c_def.add_method(name, parameters, statement)
 
             self.classes[class_name] = c_def
@@ -134,7 +134,7 @@ class ObjectDefinition:
     def __find_method(self, method_name) -> Method:
         if method_name in self.methods:
             return self.methods[method_name]
-        self.interpreter.error(ErrorType.NAME_ERROR)
+        self.interpreter.error(ErrorType.TYPE_ERROR)
 
     def run_method(self, method_name, parameters = {}):
         method = self.__find_method(method_name)
@@ -154,7 +154,7 @@ class ObjectDefinition:
             return self.fields[s].value
         if s in self.interpreter.classes:
             return self.interpreter.classes[s]
-        self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
+        self.interpreter.error(ErrorType.TYPE_ERROR, f'{s} is not defined')
 
     def __solve_expression(self, expression, parameters = {}):
         if type(expression) != list:
@@ -296,7 +296,7 @@ class ObjectDefinition:
             self.fields[var_name].value = var_val
             return Value(str(InterpreterBase.NULL_DEF), None), False
         
-        self.interpreter.error(ErrorType.NAME_ERROR)
+        self.interpreter.error(ErrorType.TYPE_ERROR)
 
 
     def __execute_call_statement(self, statement, parameters = {}):
