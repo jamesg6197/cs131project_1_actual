@@ -380,6 +380,7 @@ class ObjectDefinition:
             
 
     def __execute_while_statement(self, statement, parameters = {}):
+        self.interpreter.error(ErrorType.TYPE_ERROR)
         _, cond_exp, exp = statement
         
         cond_res = self.__solve_expression(cond_exp, parameters)
@@ -551,7 +552,7 @@ program_6 = ['(class main',
                 '(method factorial ()',
                     '(begin',
                         '(set result 2)',
-                        '(while (! (new main))',
+                        '(while  (new main))',
                             '(begin',
                                 '(set result (* num result))',
                                 '(set num (- num 1))',
