@@ -171,7 +171,7 @@ class ObjectDefinition:
             if operator == "!":
                 op1 = self.convert_value(op1, parameters)
                 if op1.type == bool:
-                    return Value(str(not operator).lower(), bool)
+                    return Value(str(not op1.get_pythonic_val()).lower(), bool)
                 
             if operator == InterpreterBase.NEW_DEF:
                 if op1 not in self.interpreter.classes:
@@ -617,7 +617,7 @@ program_11 = [
     '(class main',
     '(method main ()',
         '(if (true)',
-            '(print (! false))',
+            '(print (! true))',
             ')',
         ')',
     ')',
