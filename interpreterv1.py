@@ -394,6 +394,8 @@ class ObjectDefinition:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
+        if type(cond_res) != Value or cond_res.type != bool:
+                self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
 
