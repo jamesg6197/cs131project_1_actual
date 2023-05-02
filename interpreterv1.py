@@ -228,17 +228,22 @@ class ObjectDefinition:
                 (op1.type == str and op2.type == str) or \
                 (op1.type == bool and op2.type == bool):
                     return Value(str(op1_py_val != op2_py_val).lower(), bool)
+                if (op1.type == None and op2.type == None):
+                    return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == None or op2.type == None):
                     return Value(InterpreterBase.TRUE_DEF, bool)
+                    
+                
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
                 if (op1.type == int and op2.type == int) or \
                 (op1.type == str and op2.type == str) or \
                 (op1.type == bool and op2.type == bool):
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
-                if (op1.type == None or op2.type == None):
+                if (op1.type == None and op2.type == None):
+                    return Value(InterpreterBase.TRUE_DEF, bool)
+                elif (op1.type == None or op2.type == None):
                     return Value(InterpreterBase.FALSE_DEF, bool)
-                
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'== operator not supported between {op1.type} and {op2.type}')
             elif operator == "&":
                 if (op1.type == bool and op2.type == bool):
@@ -313,7 +318,6 @@ class ObjectDefinition:
     def __execute_if_statement(self, statement, parameters):
         _, cond_exp, true_exp, *false_exp, = statement
         cond_res = self.__solve_expression(cond_exp, parameters)
-
         if type(cond_res) != Value or cond_res.type != bool:
             self.interpreter.error(ErrorType.TYPE_ERROR)
         exit_flag = False
@@ -590,7 +594,7 @@ program_10 = ['(class person',
 program_11 = [
     '(class main',
     '(method main ()',
-        '(if (true)',
+        '(if (== null null)',
             '(print "hello")',
             ')',
         ')',
