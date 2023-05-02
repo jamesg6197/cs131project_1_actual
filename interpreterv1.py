@@ -10,8 +10,8 @@ def convert_string_to_native_val(s):
         return True, Value(s[1:-1], str)
     elif check_bool(s):
         if s == 'true':
-            return True, Value(str(True).lower(), bool)
-        return True, Value(str(False).lower(), bool)
+            return True, Value(InterpreterBase.TRUE_DEF, bool)
+        return True, Value(InterpreterBase.FALSE_DEF, bool)
     elif check_null(s):
         return True, Value(InterpreterBase.NULL_DEF, None)
     else:
@@ -202,7 +202,7 @@ class ObjectDefinition:
 
             elif operator == "/":
                 if (op1.type == int and op2.type == int):
-                    return Value(str(op1_py_val / op2_py_val), int)
+                    return Value(str(int(op1_py_val / op2_py_val)), int)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'/ operator not supported between {op1.type} and {op2.type}')
             elif operator == "%":
                 if (op1.type == int and op2.type == int):
@@ -277,7 +277,6 @@ class ObjectDefinition:
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
-            print(method_params)
             res = self.run_method(method, method_params)
             return res, False
 
@@ -588,15 +587,15 @@ program_10 = ['(class person',
 ')',
 ]
 interpreter = Interpreter()
-# interpreter.run(program_1) 
-# print()
-# interpreter.run(program_2) 
-# print()
-# interpreter.run(program_3)
-# print()
-# interpreter.run(program_4)
-# print()
-#interpreter.run(program_6)
-# interpreter.run(program_7)
-# print()
+interpreter.run(program_1) 
+print()
+interpreter.run(program_2) 
+print()
+interpreter.run(program_3)
+print()
+interpreter.run(program_4)
+print()
+interpreter.run(program_6)
+interpreter.run(program_7)
+print()
 interpreter.run(program_10)
