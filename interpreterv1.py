@@ -303,6 +303,8 @@ class ObjectDefinition:
         else:
             if type(obj) == list:
                 obj = self.__solve_expression(obj, parameters)
+                if type(obj) != ObjectDefinition:
+                    self.interpreter.error(ErrorType.TYPE_ERROR)
             elif obj not in self.fields:
                 self.interpreter.error(ErrorType.NAME_ERROR)
 
