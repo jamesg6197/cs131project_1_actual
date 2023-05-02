@@ -304,7 +304,7 @@ class ObjectDefinition:
         method_params = [self.__solve_expression(param, parameters) for param in method_params]
         if obj == InterpreterBase.ME_DEF:
             if method not in self.methods:
-                self.interpreter.error(ErrorType.NAME_ERROR)
+                self.interpreter.error(ErrorType.TYPE_ERROR)
             if len(method_params) != len(self.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
             method_params = {self.methods[method].parameters[i]: self.convert_value(method_params[i], parameters) for i in range(len(method_params))}
@@ -319,7 +319,7 @@ class ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
 
             elif obj not in self.fields:
-                self.interpreter.error(ErrorType.NAME_ERROR)
+                self.interpreter.error(ErrorType.TYPE_ERROR)
 
             else:
                 obj = self.fields[obj].value
@@ -328,7 +328,7 @@ class ObjectDefinition:
 
 
             if method not in obj.methods:
-                self.interpreter.error(ErrorType.NAME_ERROR)
+                self.interpreter.error(ErrorType.TYPE_ERROR)
 
             if len(method_params) != len(obj.methods[method].parameters):
                 self.interpreter.error(ErrorType.TYPE_ERROR)
@@ -431,7 +431,7 @@ program_12 = [
 
 	'(class main',
          '(method foo (q) ',
-           '(while ((== null null))',
+           '(while (== 7 "7")',
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
@@ -446,18 +446,18 @@ program_12 = [
       ')',
 
 ]
-##interpreter = Interpreter()
-# # # interpreter.run(program_1) 
-# # # print()
-# # # interpreter.run(program_2) 
-# # # print()
-# # # interpreter.run(program_3)
-# # # print()
-# # # interpreter.run(program_4)
-# # # print()
-# # #interpreter.run(program_6)
-# # # interpreter.run(program_7)
-# # # print()
-# # #interpreter.run(program_10)
-# # #
-#interpreter.run(program_12)
+# interpreter = Interpreter()
+# # # # interpreter.run(program_1) 
+# # # # print()
+# # # # interpreter.run(program_2) 
+# # # # print()
+# # # # interpreter.run(program_3)
+# # # # print()
+# # # # interpreter.run(program_4)
+# # # # print()
+# # # #interpreter.run(program_6)
+# # # # interpreter.run(program_7)
+# # # # print()
+# # # #interpreter.run(program_10)
+# # # #
+# interpreter.run(program_12)
