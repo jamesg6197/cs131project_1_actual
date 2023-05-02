@@ -350,7 +350,7 @@ class ObjectDefinition:
     def __execute_inputs_statement(self, statement, parameters):
         _, input_field = statement
         user_input = self.interpreter.get_input()
-        input_val = "'" + user_input + "'"
+        input_val = '"' + user_input + '"'
         self.__execute_set_statement([InterpreterBase.SET_DEF, input_field, input_val], parameters)
         return Value(str(InterpreterBase.NULL_DEF), None), False
 
@@ -586,7 +586,7 @@ program_10 = ['(class person',
  ')',
 ')',
 ]
-# interpreter = Interpreter()
+interpreter = Interpreter()
 # interpreter.run(program_1) 
 # print()
 # interpreter.run(program_2) 
@@ -598,4 +598,4 @@ program_10 = ['(class person',
 #interpreter.run(program_6)
 # interpreter.run(program_7)
 # print()
-# interpreter.run(program_10)
+interpreter.run(program_10)
