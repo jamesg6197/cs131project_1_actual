@@ -198,9 +198,9 @@ class ObjectDefinition:
                 op2 = self.__solve_expression(op2, parameters)
             op1 = self.convert_value(op1, parameters)
             op2 = self.convert_value(op2, parameters)
-            if type(op1) != ObjectDefinition:
+            if type(op1) == Value:
                 op1_py_val = op1.get_pythonic_val()
-            if type(op2) != ObjectDefinition:
+            if type(op2) == Value:
                 op2_py_val = op2.get_pythonic_val()
             if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition) and operator not in ("==", "!="):
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'{operator} not supported between objects')
@@ -256,7 +256,7 @@ class ObjectDefinition:
                 if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.TRUE_DEF, bool)
                 if (op1.type == op2.type):
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                    return Value(str(op1_py_val == op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
                 if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
@@ -428,11 +428,11 @@ program_12 = [
 
 
 	'(class main',
-        '(field num true)'
+        '(field num 5)'
+        
          '(method foo (q) ',
-           '(while (num)',
+           '(while (<= q num)',
                     '(begin',
-                    '(set num 10)'
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
