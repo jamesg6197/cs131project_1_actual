@@ -226,6 +226,11 @@ class ObjectDefinition:
                 (op1.type == str and op2.type == str):
                     return Value(str(op1_py_val > op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'> operator not supported between {op1.type} and {op2.type}')
+            elif operator  == "<":
+                if (op1.type == int and op2.type == int) or \
+                (op1.type == str and op2.type == str):
+                    return Value(str(op1_py_val < op2_py_val).lower(), bool)
+                self.interpreter.error(ErrorType.TYPE_ERROR, description = f'> operator not supported between {op1.type} and {op2.type}')
             elif operator == "<=":
                 if (op1.type == int and op2.type == int) or \
                 (op1.type == str and op2.type == str):
@@ -634,7 +639,7 @@ program_11 = [
     ')',
     '(method main ()',
         '(if (true)',
-            '(print (== "strin" "string"))',
+            '(print ()))',
             ')',
         ')',
     ')',
