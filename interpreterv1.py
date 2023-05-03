@@ -3,7 +3,9 @@ from bparser import BParser
 from helpers import *
 from typing import Union
 
-def convert_string_to_native_val(s):
+def convert_string_to_native_val(s, interpreter: InterpreterBase):
+    if type(s) != str:
+        interpreter.error(ErrorType.TYPE_ERROR)
     if check_int(s): 
         return True, Value(str(int(s)), int)
     elif check_string(s):
@@ -49,7 +51,7 @@ class Interpreter(InterpreterBase):
                     name, value = item[1:]
                     if name in c_def.fields:
                         super().error(ErrorType.NAME_ERROR)
-                    convert_success, value = convert_string_to_native_val(value)
+                    convert_success, value = convert_string_to_native_val(value, self)
                     if not convert_success:
                         super().error(ErrorType.TYPE_ERROR)
                     c_def.add_field(name, value)
@@ -145,7 +147,7 @@ class ObjectDefinition:
     def convert_value(self, s, parameters = {}):
         if type(s) == Value or type(s) == ObjectDefinition:
             return s
-        convert_success, value= convert_string_to_native_val(s) 
+        convert_success, value= convert_string_to_native_val(s, self.interpreter) 
         if convert_success != False:
             return value
         if s in parameters:
@@ -198,9 +200,9 @@ class ObjectDefinition:
                 op2 = self.__solve_expression(op2, parameters)
             op1 = self.convert_value(op1, parameters)
             op2 = self.convert_value(op2, parameters)
-            if type(op1) != ObjectDefinition:
+            if type(op1) == Value:
                 op1_py_val = op1.get_pythonic_val()
-            if type(op2) != ObjectDefinition:
+            if type(op2) == Value:
                 op2_py_val = op2.get_pythonic_val()
             if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition) and operator not in ("==", "!="):
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'{operator} not supported between objects')
@@ -253,17 +255,17 @@ class ObjectDefinition:
                     self.interpreter.error(ErrorType.TYPE_ERROR)
                 if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)) or (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
+                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.TRUE_DEF, bool)
                 if (op1.type == op2.type):
-                    return Value(str(op1_py_val != op2_py_val).lower(), bool)
+                    return Value(str(op1_py_val == op2_py_val).lower(), bool)
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'!= operator not supported between {op1.type} and {op2.type}')
             elif operator == "==":
                 if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)):
                     self.interpreter.error(ErrorType.TYPE_ERROR)
                 if (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
                     self.interpreter.error(ErrorType.TYPE_ERROR)
-                if (type(op1) == ObjectDefinition and (type(op2) == Value and op2.type != None)) or (type(op2) == ObjectDefinition and (type(op1) == Value and op1.type != None)):
+                if (type(op1) == ObjectDefinition and op2.type == None) or (type(op2) == ObjectDefinition and op1.type == None):
                     return Value(InterpreterBase.FALSE_DEF, bool)
                 if (op1.type == op2.type):
                     return Value(str(op1_py_val == op2_py_val).lower(), bool)
@@ -385,8 +387,6 @@ class ObjectDefinition:
                 return res, exit_flag
             if type(cond_res) != Value or cond_res.type != bool:
                 self.interpreter.error(ErrorType.TYPE_ERROR)
-        if type(cond_res) != Value or cond_res.type != bool:
-                self.interpreter.error(ErrorType.TYPE_ERROR)
         return res, exit_flag
 
 
@@ -428,15 +428,22 @@ class ObjectDefinition:
     
 program_12 = [
 
-
+    '(class person',
+        '(field x 5)',
+        '(method m () (return (new person)))',
+        ')',
 	'(class main',
+        '(field num 5)'
+        
          '(method foo (q) ',
-           '(while ((== null null))',
+           '(while (! (! (== null null)))',
+                    '(begin',
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
                             '(set q (- q 1))',
                         ')',
+                    ')',
                     ')',
            ')  ',
          ')',
@@ -446,7 +453,7 @@ program_12 = [
       ')',
 
 ]
-##interpreter = Interpreter()
+#sinterpreter = Interpreter()
 # # # interpreter.run(program_1) 
 # # # print()
 # # # interpreter.run(program_2) 
