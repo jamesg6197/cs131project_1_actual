@@ -199,15 +199,9 @@ class ObjectDefinition:
             op1 = self.convert_value(op1, parameters)
             op2 = self.convert_value(op2, parameters)
             if type(op1) != ObjectDefinition:
-                try:
-                    op1_py_val = op1.get_pythonic_val()
-                except:
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                op1_py_val = op1.get_pythonic_val()
             if type(op2) != ObjectDefinition:
-                try:
-                    op2_py_val = op2.get_pythonic_val()
-                except:
-                    self.interpreter.error(ErrorType.TYPE_ERROR)
+                op2_py_val = op2.get_pythonic_val()
             if (type(op1) == ObjectDefinition or type(op2) == ObjectDefinition) and operator not in ("==", "!="):
                 self.interpreter.error(ErrorType.TYPE_ERROR, description = f'{operator} not supported between objects')
 
@@ -378,7 +372,7 @@ class ObjectDefinition:
 
     def __execute_while_statement(self, statement, parameters = {}):
         _, cond_exp, exp = statement
-        
+        self.interpreter.error(ErrorType.TYPE_ERROR)
         cond_res = self.__solve_expression(cond_exp, parameters)
         if type(cond_res) != Value or cond_res.type != bool:
             self.interpreter.error(ErrorType.TYPE_ERROR)
