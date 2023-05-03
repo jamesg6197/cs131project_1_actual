@@ -371,8 +371,8 @@ class ObjectDefinition:
             
 
     def __execute_while_statement(self, statement, parameters = {}):
-        _, cond_exp, exp = statement
         self.interpreter.error(ErrorType.TYPE_ERROR)
+        _, cond_exp, exp = statement
         cond_res = self.__solve_expression(cond_exp, parameters)
         if type(cond_res) != Value or cond_res.type != bool:
             self.interpreter.error(ErrorType.TYPE_ERROR)
