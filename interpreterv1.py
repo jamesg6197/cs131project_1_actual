@@ -148,7 +148,7 @@ class ObjectDefinition:
         try:
             convert_success, value = convert_string_to_native_val(s) 
         except:
-            self.interpreter.error(ErrorType.TYPE_ERROR, f'{s} is not defined')
+            self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
         if convert_success != False:
             return value
         if s in parameters:
@@ -457,7 +457,7 @@ program_12 = [
       ')',
 
 ]
-#interpreter = Interpreter()
+interpreter = Interpreter()
 # # # interpreter.run(program_1) 
 # # # print()
 # # # interpreter.run(program_2) 
@@ -471,4 +471,4 @@ program_12 = [
 # # # print()
 # # #interpreter.run(program_10)
 # # #
-#interpreter.run(program_12)
+interpreter.run(program_12)
