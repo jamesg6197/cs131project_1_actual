@@ -3,9 +3,7 @@ from bparser import BParser
 from helpers import *
 from typing import Union
 
-def convert_string_to_native_val(s, interpreter: InterpreterBase):
-    if type(s) != str:
-        interpreter.error(ErrorType.TYPE_ERROR)
+def convert_string_to_native_val(s):
     if check_int(s): 
         return True, Value(str(int(s)), int)
     elif check_string(s):
@@ -51,7 +49,7 @@ class Interpreter(InterpreterBase):
                     name, value = item[1:]
                     if name in c_def.fields:
                         super().error(ErrorType.NAME_ERROR)
-                    convert_success, value = convert_string_to_native_val(value, self)
+                    convert_success, value = convert_string_to_native_val(value)
                     if not convert_success:
                         super().error(ErrorType.TYPE_ERROR)
                     c_def.add_field(name, value)
@@ -147,7 +145,10 @@ class ObjectDefinition:
     def convert_value(self, s, parameters = {}):
         if type(s) == Value or type(s) == ObjectDefinition:
             return s
-        convert_success, value= convert_string_to_native_val(s, self.interpreter) 
+        try:
+            convert_success, value = convert_string_to_native_val(s) 
+        except:
+            self.interpreter.error(ErrorType.TYPE_ERROR, f'{s} is not defined')
         if convert_success != False:
             return value
         if s in parameters:
@@ -434,10 +435,13 @@ program_12 = [
         ')',
 	'(class main',
         '(field num 5)'
-        
+        '(field x true)'
          '(method foo (q) ',
-           '(while (! (! (== null null)))',
+           '(while (+ num -7)',
                     '(begin',
+                    '(print "hello")',
+                    '(set num (new person))',
+                    '(set x num)',
                     '(if (== (% q 3) 0)',
                         '(begin',
                             '(return)  # immediately terminates loop and function foo',
@@ -453,7 +457,7 @@ program_12 = [
       ')',
 
 ]
-#sinterpreter = Interpreter()
+#interpreter = Interpreter()
 # # # interpreter.run(program_1) 
 # # # print()
 # # # interpreter.run(program_2) 
