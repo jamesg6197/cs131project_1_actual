@@ -145,10 +145,7 @@ class ObjectDefinition:
     def convert_value(self, s, parameters = {}):
         if type(s) == Value or type(s) == ObjectDefinition:
             return s
-        try:
-            convert_success, value = convert_string_to_native_val(s) 
-        except:
-            self.interpreter.error(ErrorType.NAME_ERROR, f'{s} is not defined')
+        convert_success, value = convert_string_to_native_val(s) 
         if convert_success != False:
             return value
         if s in parameters:
