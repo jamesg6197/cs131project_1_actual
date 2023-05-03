@@ -371,7 +371,7 @@ class ObjectDefinition:
             
 
     def __execute_while_statement(self, statement, parameters = {}):
-        if len(statement) <= 2:
+        if len(statement) != 3:
             self.interpreter.error(ErrorType.TYPE_ERROR)
         _, cond_exp, exp = statement
 
